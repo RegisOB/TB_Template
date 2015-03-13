@@ -16,5 +16,20 @@ of samples from suspected TB Cases
 ```{r}
 install.packages(c("xlsx","ggplot2","chron","knitr","mardown"), dependencies=TRUE)
 ```
+# Generating the report
+Writes few command lines in Rstudio console as following:
+
+1. Define the working directory
+```{r}
+setwd("C:\Users\Regis M Obiang Mba\Desktop\TB")
+```
+2. Put the name of database
+```{r}
+NameTable <- "TB_interlabQC_2014Q1-2014Q4.xlsx"
+```
+3.Ouput report in pdf format
+```{r}
+rmarkdown:render("TB_Template.Rmd", "pdf_document")
+```
 
 
