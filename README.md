@@ -10,7 +10,7 @@ of samples from suspected TB Cases
 # Installation and configuration
 1. Download the 'Template' folder
 2. Create a new folder called 'TB' in your desktop
-3. Copy all files contained from the 'Template' folder to 'TB'
+3. Copy all files contained into the 'Template' folder to 'TB'
 4. Open Rstudio statistical software
 5. Install the r packages (xlsx, ggplot2, chron, knitr and markdown) in using this command line 
 ```{r}
@@ -23,11 +23,12 @@ Writes few command lines in Rstudio console as following:
 ```{r}
 setwd("C:\Users\Regis M Obiang Mba\Desktop\TB")
 ```
+
 2. Put the name of database
 ```{r}
 NameTable <- "TB_interlabQC_2014Q1-2014Q4.xlsx"
 ```
-3.Ouput report in pdf format
+3. Ouput report in pdf format
 ```{r}
 rmarkdown:render("TB_Template.Rmd", "pdf_document")
 ```
