@@ -14,7 +14,7 @@ of samples from suspected TB Cases
 4. Open Rstudio statistical software
 5. Install the r packages (xlsx, ggplot2, chron, knitr and markdown) in using this command line 
 ```{r}
-install.packages(c("xlsx","ggplot2","chron","knitr","mardown"), dependencies=TRUE)
+install.packages(c("xlsx","ggplot2","chron","knitr","markdown"), dependencies=TRUE)
 ```
 # Generating the report
 Writes few command lines in Rstudio console as following:
