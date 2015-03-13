@@ -14,7 +14,6 @@ output:
     fig_caption: yes
     fig_height: 3
     fig_width: 7
-logo: null
 ---
 
 **Supra-National Laboratory**: German National Reference Center for Tuberculosis, Borstel
