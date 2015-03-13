@@ -1,0 +1,170 @@
+
+
+---
+title: Results of Supra-National Inter-Laboratory Comparison of Samples from Suspected
+  TB Cases
+author: 'Laboratory under evaluation: CERMEL'
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    includes:
+      in_header: logoCermel.tex
+    keep_tex: yes
+  word_document:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 7
+logo: null
+---
+
+**Supra-National Laboratory**: German National Reference Center for Tuberculosis, Borstel
+
+Method:
+======
+Ziehl-Neelsen Smear
+```{r data1,echo=FALSE,message=FALSE,cache=TRUE}
+##Importing and manipulation data
+library(xlsx) 
+data0 <- read.xlsx(NameTable, 1, header=T)
+data2 <- data0[,c(1:12)]
+data3 <- data2
+levels(data3$ZN_CERMEL)<-c(rep(1,4),rep(0,2))
+levels(data3$ZN_Borstel)<-c(rep(1,5),rep(0,2))
+```
+
+Dates
+=====
+```{r dat,  echo=FALSE, message=FALSE}
+#Convert to date
+data3$Date_Specimen <-as.Date(strptime(data3$Date_Specimen, format="%Y-%m-%d"))
+```
+**`r min(data3$Date_Specimen)`** to **`r max(data3$Date_Specimen)`**
+
+Sample frame 
+============
+- Total sample: `r nrow(data3)`
+- CERMEL positives: `r table(data3$ZN_CERMEL)[1]`/`r table(data3$ZN_CERMEL)[1]`
+- CERMEL negatives: `r table(data3$ZN_CERMEL)[2]`/`r table(data3$ZN_CERMEL)[2]`
+
+Summary table
+=============
+```{r tab1, results='asis',echo=F,message=FALSE}
+##Crosstable
+tab1 <- table(data3$ZN_CERMEL, data3$ZN_Borstel)
+dimnames(tab1) <- list(CERMEL = c('Positive','Negative'), Borstel =c('Positive', 'Negative'))
+library(knitr)
+tab1 <- as.data.frame(tab1)
+names(tab1)[3] <-"N"
+kable(tab1)
+```
+
+\pagebreak
+
+Discordant table
+================
+```{r tab2, results='asis',echo=FALSE, message=FALSE}
+##Searching ID_CERMEL discordant
+disc_index <- which(data3$ZN_CERMEL!=data3$ZN_Borstel)
+disc_NameCode <- data3$ID_CERMEL[disc_index]
+
+##Discordant Table 
+tab2 <- subset(data0, is.element(data0[,2],disc_NameCode))
+tab2 <- tab2[,1:12]
+kable(tab2[,c(2,4,9,10,11,12)],row.names = F)
+```
+
+Accuracy, overall
+================
+```{r tab3, echo=FALSE, results='asis',message=FALSE}
+tab3 <- table(data3$ZN_CERMEL, data3$ZN_Borstel)
+cord1 <- sum(tab3[1,1]+tab3[2,2])
+tot1 <- sum(tab3)
+cord2 <- tot1-cord1
+nPCERMEL <- sum(tab3[1,1]+tab3[1,2])
+nNCERMEL <- sum(tab3[2,1]+tab3[2,2])
+```
+
+- Concordant sample N(%): `r cord1` (`r round(100*cord1/tot1,0)`%)
+- Discordant sample N(%): `r cord2` (`r round(100*cord2/tot1,0)`%)
+    + False positives N(%): `r tab3[1,2]` (`r round(100*tab3[1,2]/nPCERMEL,0)`%)
+    + False negatives N(%): `r tab3[1,2]` (`r round(100*tab3[2,1]/nNCERMEL,0)`%)
+
+```{r tab3b, echo=FALSE, results='asis',message=FALSE}
+
+##Data manipulation
+library(chron)
+data3$quarter <- quarters(as.chron(data3$Date_Specimen))
+levels(data3$quarter) <-c('Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec')
+data_oct_dec <- subset(data3, quarter=='Oct-Dec')
+
+tab_oct_dec <- table(data_oct_dec$ZN_CERMEL, data_oct_dec$ZN_Borstel)
+cord1 <- sum(tab_oct_dec[1,1]+tab_oct_dec[2,2])
+tot1 <- sum(tab_oct_dec)
+cord2 <- tot1-cord1
+nPCERMEL <- sum(tab_oct_dec[1,1]+tab_oct_dec[1,2])
+nNCERMEL <- sum(tab_oct_dec[2,1]+tab_oct_dec[2,2])
+```
+
+Accuracy, most recent quarter (Oct-Dec)
+=======================================
+- Total sample: `r nrow(data_oct_dec)`
+- Concordant sample N(%): `r cord1` (`r round(100*cord1/tot1,0)`%)
+- Discordant sample N(%): `r cord2` (`r round(100*cord2/tot1,0)`%)
+    - False positives N(%): `r tab_oct_dec[1,2]` (`r round(100*tab_oct_dec[1,2]/nPCERMEL,0)`%)
+    - False negatives N(%): `r tab_oct_dec[1,2]` (`r round(100*tab_oct_dec[2,1]/nNCERMEL,0)`%)
+
+
+
+Tagret accuracy: Percentage discordant samples (5%)
+====================================================
+```{r fig1,  echo=FALSE, message=FALSE, fig.show='asis'}
+library(ggplot2)
+tab2$Date_Specimen <-as.POSIXlt(strptime(tab2$Date_Specimen, format="%Y-%m-%d"))
+tab2$quater <- quarters(as.chron(tab2$Date_Specimen))
+levels(tab2$quater) <-c('Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec')
+
+#graphic
+tab4 <-table(tab2$quater)
+tab4 <-as.data.frame(tab4)
+tab2a <- subset(data0, !is.element(data0[,2],disc_NameCode))
+
+tab2a$Date_Specimen <-as.POSIXlt(strptime(tab2a$Date_Specimen, format="%Y-%m-%d"))
+tab2a$quater_a <- quarters(as.chron(tab2a$Date_Specimen))
+levels(tab2a$quater_a) <-c('Jan-Mar', 'Apr-Jun', 'Jul-Sep', 'Oct-Dec')
+tab4a <-table(tab2a$quater_a)
+tab4a <-as.data.frame(tab4a)
+
+tab5 <-cbind(tab4, tab4a$Freq)
+tab5 <- transform(tab5, per=100*Freq/(tab4a$Freq+Freq))
+tab6 <-rbind(tab4, tab4a)
+tab6$Disc <-as.factor(c(rep("Discordant",4), rep("Concordant",4)))
+#########################################################################
+
+##Plot discordant lines
+fig1 <-ggplot(tab5, aes(x=Var1, y=per,ymin=0, group=4)) + geom_line() + geom_point()+
+  xlab('Time')+ylab('Discordants (%)')+
+  geom_hline(yintercept = 5, colour="red", linetype = "longdash")+
+  annotate("text", x=0.8, y=5.5, label="Tagret accuracy", colour="red", size=3)
+fig1
+
+##Plot barplot discordant
+fig2 <-ggplot(tab6, aes(x=Var1, y=Freq, ymax=max(Freq)+5, fill=Disc)) +
+geom_bar(stat="identity", position="dodge") +
+geom_text(aes(label=Freq), vjust=-0.5, colour="black",
+position=position_dodge(.9), size=4)+xlab('Time')+ylab('Count (n)')+
+guides(fill=guide_legend(title=NULL))+scale_fill_manual(values = c("grey","black"))+
+theme(legend.position="top") 
+fig2
+#########################################################################
+```
+
+
+
+
+
+
+
+
+
+
+
